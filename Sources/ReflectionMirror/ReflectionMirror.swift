@@ -184,7 +184,7 @@ public func _forEachFieldWithKeyPath<Root>(
       continue;
     }
     func keyPathType<Leaf>(for: Leaf.Type) -> PartialKeyPath<Root>.Type {
-      if field.isVar { return WritableKeyPath<Root, Leaf>.self }
+      if field.isVar { return ReferenceWritableKeyPath<Root, Leaf>.self }
       return KeyPath<Root, Leaf>.self
     }
     let resultSize = MemoryLayout<Int32>.size + MemoryLayout<Int>.size
@@ -198,7 +198,7 @@ public func _forEachFieldWithKeyPath<Root>(
         hasReferencePrefix: false
       ))
       let component = RawKeyPathComponent(
-           header: RawKeyPathComponent.Header(stored: .struct,
+           header: RawKeyPathComponent.Header(stored: .class,
                                               mutable: field.isVar,
                                               inlineOffset: UInt32(offset)),
            body: UnsafeRawBufferPointer(start: nil, count: 0))
