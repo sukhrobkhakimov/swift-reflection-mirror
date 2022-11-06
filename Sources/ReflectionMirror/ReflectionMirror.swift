@@ -161,8 +161,6 @@ public func _forEachFieldWithKeyPath<Root>(
   if _isClassType(type) != options.contains(.classType) {
     return false
   }
-  let ignoreUnknown = options.contains(.ignoreUnknown)
-
   let childCount = _getRecursiveChildCount(type)
   for i in 0..<childCount {
     let offset = _getChildOffset(type, index: i)
@@ -170,19 +168,6 @@ public func _forEachFieldWithKeyPath<Root>(
     var field = _FieldReflectionMetadata()
     let childType = _getChildMetadata(type, index: i, fieldMetadata: &field)
     defer { field.freeFunc?(field.name) }
-    let kind = _MetadataKind(childType)
-    let supportedType: Bool
-    switch kind {
-      case .struct, .class, .optional, .existential,
-          .existentialMetatype, .tuple, .enum:
-        supportedType = true
-      default:
-        supportedType = false
-    }
-    if !supportedType || !field.isStrong {
-      if !ignoreUnknown { return false }
-      continue;
-    }
     func keyPathType<Leaf>(for: Leaf.Type) -> PartialKeyPath<Root>.Type {
       if field.isVar { return ReferenceWritableKeyPath<Root, Leaf>.self }
       return KeyPath<Root, Leaf>.self
